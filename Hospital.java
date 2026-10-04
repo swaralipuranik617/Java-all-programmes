@@ -1,7 +1,7 @@
 import java.sql.*;
 import java.util.Scanner;
 
-public class Login {
+public class Hospital {
 
     public static void main(String[] args) {
 
@@ -11,10 +11,10 @@ public class Login {
 
         Scanner sc = new Scanner(System.in);
 
-        System.out.print("Enter username: ");
-        String user = sc.nextLine();
+        System.out.print("Enter Login ID: ");
+        String loginId = sc.nextLine();
 
-        System.out.print("Enter password: ");
+        System.out.print("Enter Password: ");
         String pass = sc.nextLine();
 
         try {
@@ -25,25 +25,41 @@ public class Login {
                 url, username, password
             );
 
-            String query = "SELECT * FROM login WHERE username = ? AND password = ?";
+            String query =
+                "SELECT role FROM hospital_staff " +
+                "WHERE login_id = ? AND password = ?";
 
             PreparedStatement pstmt = con.prepareStatement(query);
 
-            pstmt.setString(1, user);
+            pstmt.setString(1, loginId);
             pstmt.setString(2, pass);
 
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
+
+                String role = rs.getString("role");
+
                 System.out.println("Login Successful!");
+
+                if (role.equalsIgnoreCase("Doctor")) {
+                    System.out.println("Access Granted: Doctor Portal");
+                }
+                else if (role.equalsIgnoreCase("Nurse")) {
+                    System.out.println("Access Granted: Nurse Portal");
+                }
+
             } else {
-                System.out.println("Invalid Username or Password!");
+
+                System.out.println("Invalid Login ID or Password!");
+                System.out.println("Access Denied.");
             }
 
             con.close();
             sc.close();
 
         } catch (Exception e) {
+
             System.out.println("Database Error: " + e.getMessage());
         }
     }
